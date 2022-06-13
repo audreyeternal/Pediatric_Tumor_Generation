@@ -1,6 +1,6 @@
 class hparams:
 
-    Program_name = 'deeplab_augment'
+    Program_name = 'UNet_augment'
     train_or_test = 'test'
     output_dir = 'logs/' + Program_name
     aug = None

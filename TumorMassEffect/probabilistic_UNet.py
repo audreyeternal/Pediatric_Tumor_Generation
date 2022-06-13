@@ -4,6 +4,7 @@ import numpy as np
 import torch.nn.functional as F
 from torch.distributions import Normal, Independent, kl
 from net_utils import warp_image_diffeomorphic
+import SimpleITK as sitk
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def truncated_normal_(tensor, mean=0, std=1):
     size = tensor.shape
@@ -443,7 +444,8 @@ class ProbabilisticUnet(nn.Module):
         print(f'============size of input is {input.shape}===========')
         # here comes the warping part!!!
         self.reconstruction_warped, self.computed_displ = warp_image_diffeomorphic(input,self.displ, mode='bilinear',ret_displ=True)
-        reconstruction_loss = criterion(input=self.reconstruction_warped, target=segm)
+        # sitk.WriteImage(sitk.GetImageFromArray(self.reconstruction_warped.cpu().clone().detach().numpy()), 'images/reconstruction_warped.nii.gz')
+        reconstruction_loss = criterion(input=self.reconstruction_warped.to(device), target=segm)
         self.reconstruction_loss = reconstruction_loss
         return -(20*self.reconstruction_loss+ self.beta * self.kl)
         # return -(20*self.reconstruction_loss)

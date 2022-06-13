@@ -52,14 +52,14 @@ except ImportError:
 from pytorch_fid.inception import InceptionV3
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-parser.add_argument('--batch-size', type=int, default=50,
+parser.add_argument('--batch-size', type=int, default=2,
                     help='Batch size to use')
 parser.add_argument('--num-workers', type=int,
                     help=('Number of processes to use for data loading. '
                           'Defaults to `min(8, num_cpus)`'))
 parser.add_argument('--device', type=str, default=None,
                     help='Device to use. Like cuda, cuda:0 or cpu')
-parser.add_argument('--dims', type=int, default=2048,
+parser.add_argument('--dims', type=int, default=1024,
                     choices=list(InceptionV3.BLOCK_INDEX_BY_DIM),
                     help=('Dimensionality of Inception features to use. '
                           'By default, uses pool3 features'))

@@ -31,6 +31,16 @@ def read_image(path,front=0,back=0):
     img = img[:,:,front:(size-back-1)]
     return img
 
+def write_img_slice(img,filepath):
+    img_arr = resize(img,size=[24,180,180],flip=True).to(dtype=torch.float32).cpu().numpy()
+    for k in range(2,(img_arr.shape[0]-3)):
+        img_arr_slice = pad(img_arr[k,:,:].copy())
+        img_arr_slice = sitk.GetImageFromArray(img_arr_slice)
+        img_arr_slice = sitk.RescaleIntensity(img_arr_slice)
+        img_arr_slice = sitk.Cast(img_arr_slice,sitk.sitkUInt8)
+        sitk.WriteImage(img_arr_slice,f'/host_project/TumorMassEffect/images/origin_openneuro_img/{os.path.basename(filepath).split(".")[0]}_{k}.png')
+
+
 def pad(img_arr,pad_size=240):
     size = img_arr.shape
     padding_width = (pad_size-size[0])//2
@@ -197,10 +207,11 @@ if __name__== '__main__':
             print("Reg weight changed: "+str(reg_weight))
         for iteration, batch in enumerate(training_data_loader, 1):
             images_und = batch['image_und'].to(device)
-            # sitk.WriteImage(sitk.GetImageFromArray(images_und.cpu().numpy()),r'images/undeformed_test.nii')
+            # sitk.WriteImage(sitk.GetImageFromArray(images_und.cpu().numpy()),f'images/undeformed_test_{iteration}.nii')
             images_def = batch['image_def'].to(device)
+            # sitk.WriteImage(sitk.GetImageFromArray(images_def.cpu().numpy()),f'images/deformed_test_{iteration}.nii')
             tumor=batch['tumor'].to(device)
-            print(f'the shape of the concat:{torch.cat((images_def,tumor),dim=1).shape}')
+            # print(f'the shape of the concat:{torch.cat((images_def,tumor),dim=1).shape}')
             netG(torch.cat((images_def,tumor),dim=1),torch.cat((images_und,tumor),dim=1)) #2022-03-07需要理解一下,dimension是5,故应是拼接在channel上。
             elbo = netG.elbo(images_def, images_und)#2022-03-16 为何是这两个做elbo? 因为在elbo函数里要做reconstruction loss.
             print(f'===========the elbo is {elbo.item()}============')
@@ -250,10 +261,16 @@ if __name__== '__main__':
                 # print(f'---------prediction 尺寸:{prediction.shape}--------')#[1, 3, 24, 128, 128]
                 # print(computed_displ.shape)#(1,100,100,100,3)
                 filepaths = glob('/data_dir/OpenNeuro_children/*/*frac.nii.gz',recursive=True)
-                for filepath in filepaths:
+                origin_filepaths = glob('/data_dir/OpenNeuro_children/*/*bfc.nii.gz',recursive=True)
+                for filepath,origin_filepath in zip(filepaths,origin_filepaths):
+
 
                 # origin_img_classified_path = r"/host_project/TumorMassEffect/images/sub-pixar019_anat_sub-pixar019_T1w_sliced.pvc.frac.nii.gz"
                     origin_img_classified = read_image(filepath,front=3,back=3) # have value from 0 - 4.
+                    origin_img = read_image(origin_filepath,front=3,back=3)
+                    write_img_slice(origin_img,filepath)
+
+    """
                 # origin_img = read_image('/host_project/TumorMassEffect/images/sub-pixar019_anat_sub-pixar019_T1w_sliced.bse.nii.gz',front=3,back=3)
                 #intepolate using grid_sample:
                     img_out_arr = resize(origin_img_classified,size=[24,180,180],flip=True)
@@ -299,7 +316,7 @@ if __name__== '__main__':
                 # image_wrapped_sitk = sitk.GetImageFromArray(image_wrapped_sitk_arr)
                 # # sitk.WriteImage(image_wrapped_sitk,r'images/testImage_IXI024-Guys-0705-T1_pveseg_sliced.nii')
                 # sitk.WriteImage(image_wrapped_sitk,r'images/pdt_df/testImage_IXI024-Guys-0705-T1_pveseg_sliced.nii')
-
+    """
     
                 
 

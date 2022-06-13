@@ -140,4 +140,10 @@ Pytorch-Medical-Segmentation/data/
 Pytorch-Medical-Segmentation/logs/
 Pytorch-Medical-Segmentation/results/
 git-lfs-3.2.0/
+Pytorch-Medical-Segmentation/nohup.out
+Pytorch-Medical-Segmentation/__pycache__/
+MEGAN/
+MEGAN/__pycache__/ 
+pix2pixHD/
+pix2pixHD/__pycache__/
 
