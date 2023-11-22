@@ -95,3 +95,88 @@ def crop_BB(img, offset=3, crop_coords=None):
             z_max = min(z_max , img.shape[2])
             return img[x_min:x_max, y_min:y_max, z_min:z_max], crop_coords
         return img[x_min:x_max, y_min:y_max], crop_coords
+
+def showTrainingData(training_data_loader):
+    # test loaded data
+    loaded_data = next(iter(training_data_loader))
+    image_def = loaded_data['image_def']
+    image_und = loaded_data['image_und']
+    mask = loaded_data['mask']
+    tumor = loaded_data['tumor']
+
+    def show_image(input, title):
+        def show_slices(slices, cmap):
+            """ Function to display row of image slices """
+            fig, axes = plt.subplots(1, len(slices))
+            for i, slice in enumerate(slices):
+                axes[i].imshow(slice.T, cmap=cmap, origin="lower")
+
+        print(f"Feature batch shape: {input.size()}")
+        if len(input.size()) > 4:
+            numpy_input = input.numpy().squeeze(axis=0)
+        else:
+            numpy_input = input.numpy()
+        for img_channel in range(numpy_input.shape[0]):
+            img_3d = numpy_input[img_channel]
+            print(f'Channel {img_channel} img:')
+            H, W, C = img_3d.shape
+            slice_0 = img_3d[int(H / 2), :, :]
+            slice_1 = img_3d[:, int(W / 2), :]
+            slice_2 = img_3d[:, :, int(C / 2)]
+            show_slices([slice_0, slice_1, slice_2], "gray")
+            plt.suptitle(title)
+            plt.show()
+
+    show_image(image_def, 'Deformed')
+    show_image(image_und, 'Undeformed')
+    show_image(mask, 'BrainMask')
+    show_image(tumor, 'Tumor')
+
+def showTestData(test_data_loader):
+    # test loaded data
+    loaded_data = next(iter(test_data_loader))
+    image_def = loaded_data['image_def']
+    # generated_tumor = loaded_data['generated_tumor']
+    tumor = loaded_data['tumor']
+
+    def show_image(input, title):
+        def show_slices(slices, cmap):
+            """ Function to display row of image slices """
+            fig, axes = plt.subplots(1, len(slices))
+            for i, slice in enumerate(slices):
+                axes[i].imshow(slice.T, cmap=cmap, origin="lower")
+
+        print(f"Feature batch shape: {input.size()}")
+        if len(input.size()) > 4:
+            numpy_input = input.numpy().squeeze(axis=0)
+        else:
+            numpy_input = input.numpy()
+        for img_channel in range(numpy_input.shape[0]):
+            img_3d = numpy_input[img_channel]
+            print(f'Channel {img_channel} img:')
+            H, W, C = img_3d.shape
+            slice_0 = img_3d[int(H / 2), :, :]
+            slice_1 = img_3d[:, int(W / 2), :]
+            slice_2 = img_3d[:, :, int(C / 2)]
+            show_slices([slice_0, slice_1, slice_2], "gray")
+            plt.suptitle(title)
+            plt.show()
+
+    show_image(image_def, 'Deformed')
+    # show_image(generated_tumor, 'Generated_tumor')
+    show_image(tumor, 'Tumor')
+
+def show3SlicesFromNumpy(img_3d, title):
+    def show_slices(slices, cmap):
+        """ Function to display row of image slices """
+        fig, axes = plt.subplots(1, len(slices))
+        for i, slice in enumerate(slices):
+            axes[i].imshow(slice.T, cmap=cmap, origin="lower")
+
+    H, W, C = img_3d.shape
+    slice_0 = img_3d[int(H / 2), :, :]
+    slice_1 = img_3d[:, int(W / 2), :]
+    slice_2 = img_3d[:, :, int(C / 2)]
+    show_slices([slice_0, slice_1, slice_2], "gray")
+    plt.suptitle(title)
+    plt.show()

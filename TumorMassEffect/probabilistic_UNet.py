@@ -440,12 +440,9 @@ class ProbabilisticUnet(nn.Module):
         else:
             self.displ =self.displ.permute(0, 2, 3, 4, 1)
             # self.displ = self.displ.permute(0,3,4,2,1)
-            print(f'============size of displ is {self.displ.shape}===========')
-        print(f'============size of input is {input.shape}===========')
+
         # here comes the warping part!!!
         self.reconstruction_warped, self.computed_displ = warp_image_diffeomorphic(input,self.displ, mode='bilinear',ret_displ=True)
-        # sitk.WriteImage(sitk.GetImageFromArray(self.reconstruction_warped.cpu().clone().detach().numpy()), 'images/reconstruction_warped.nii.gz')
         reconstruction_loss = criterion(input=self.reconstruction_warped.to(device), target=segm)
         self.reconstruction_loss = reconstruction_loss
         return -(20*self.reconstruction_loss+ self.beta * self.kl)
-        # return -(20*self.reconstruction_loss)

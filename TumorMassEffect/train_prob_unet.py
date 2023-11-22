@@ -20,8 +20,8 @@ from multiprocessing import Process, freeze_support
 import pickle
 from torchsummary import summary
 from PIL import Image
-from skimage import io 
-import shutil 
+from skimage import io
+import shutil
 from glob import glob
 
 def read_image(path,front=0,back=0):
@@ -127,6 +127,7 @@ if __name__== '__main__':
     np.random.seed(32)
     np.random.shuffle(indices)
     # print(f'the number of indices is {len(indices)}')
+
     print(f'the split is {split}')
     train_idx, valid_idx = indices[split:], indices[:split]#2022-2-27. train_test split
     print(f'train_idx:{train_idx},valid_idx:{valid_idx}')# 2022-03-01 valid_idx为空(因为总数据为1)
