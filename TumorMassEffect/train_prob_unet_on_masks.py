@@ -29,12 +29,13 @@ parser.add_argument('--startRegWeight', type=int, default=0.002)
 parser.add_argument('--batchSize', type=int, default=1)
 parser.add_argument('--mode', type=str, default='test')
 parser.add_argument('--traintype', type=str, default='def', help="Types:[normal, adv, cycle, def]")
-opt = parser.parse_args()
 
-# paths
-train_data_path = '/home/fjr/data/yzhou/host_project/TumorMassEffect/'
-test_data_path  = '/home/fjr/data/yzhou/'
-yu_model_path = '/home/fjr/data/yzhou/host_project/TumorMassEffect/Results/TumorDeformations/'
+# PATHS
+parser.add_argument('--train_data_path', type=str, default='/host_project/TumorMassEffect/')
+parser.add_argument('--test_data_path', type=str, default='/')
+parser.add_argument('--model_path', type=str, default='/host_project/TumorMassEffect/Results/TumorDeformations/')
+
+opt = parser.parse_args()
 
 # torch.manual_seed(20)
 device = torch.device('cuda', opt.device)
@@ -47,9 +48,9 @@ valOutDir = os.path.join(outputDir, 'Val')
 if not os.path.exists(valOutDir):
     os.makedirs(valOutDir)
 
-train_set = PairedMaskDataset(inputDir, train_data_path)
-val_set = PairedMaskDataset(inputDir, train_data_path)
-test_set = PairedMaskDataset(inputDir, test_data_path, mode='test')
+train_set = PairedMaskDataset(inputDir, opt.train_data_path)
+val_set = PairedMaskDataset(inputDir, opt.train_data_path)
+test_set = PairedMaskDataset(inputDir, opt.test_data_path, mode='test')
 
 num_train = len(train_set)
 indices = list(range(num_train))
@@ -162,7 +163,7 @@ def test():
 
     netG.eval()
     try:
-        # model = torch.load(f'{yu_model_path}netG_epoch_{opt.nEpochs}.pth')
+        # model = torch.load(f'{opt.model_path}netG_epoch_{opt.nEpochs}.pth')
         model = torch.load(f'Results/TumorDeformations/netG_epoch_{opt.nEpochs}.pth')
     except:
         print('no pth file provided!')
